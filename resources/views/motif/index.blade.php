@@ -16,7 +16,7 @@
     @endif
     <div class="w-4/6 bg-white mx-auto rounded-xl border-2 border-gray-400 p-2 mt-5">
         <div class="flex justify-around my-8">
-            <a class="flex justify-center p-2 px-5 rounded bg-gray-400 duration-300 hover:bg-gray-800 hover:text-white" href="{{ url('/dashboard') }}">{{ __('Back') }}</a>
+            <a class="flex justify-center p-2 px-5 rounded bg-gray-400 duration-300 hover:bg-gray-800 hover:text-white" href="{{ url('/') }}">{{ __('Back') }}</a>
             <strong class="text-4xl">{{ __('Reasons listing') }}</strong>
             @can('motif-create')
                 <a class="flex justify-center p-2 px-5 rounded bg-green-500" href="{{ route('motif.create') }}">{{ __('Create') }}</a>
