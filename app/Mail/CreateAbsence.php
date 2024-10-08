@@ -19,7 +19,6 @@ class CreateAbsence extends Mailable
     public function __construct(public Absence $absence)
     {
         $this->absence = $absence;
-
     }
 
     /**

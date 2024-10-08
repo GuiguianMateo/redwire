@@ -10,6 +10,7 @@ use App\Mail\RestoreMotif;
 use App\Models\Absence;
 use App\Models\Motif;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
 
 class MotifController extends Controller
@@ -21,7 +22,9 @@ class MotifController extends Controller
      */
     public function index()
     {
-        $motifs = Motif::withTrashed()->get();
+        $motifs = Cache::remember('motifs_with_trashed', 60 * 60 * 24, function () {
+            return Motif::withTrashed()->get();
+        });
 
         return view('motif.index', compact('motifs'));
     }
@@ -39,25 +42,27 @@ class MotifController extends Controller
             return view('motif.create');
         }
         abort('403');
-
     }
 
     /**
      * Summary of store
      *
      * @param  \Illuminate\Http\Request  $request
+     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function store(MotifRequest $request)
     {
         if (Auth::user()->can('motif-create')) {
             $data = $request->all();
-            $motif = new motif;
+            $motif = new motif();
 
             $motif->titre = $data['titre'];
             $motif->is_accessible_salarie = $data['is_accessible'];
 
             $motif->save();
+
+            Cache::forget('motifs_with_trashed');
 
             Mail::to(users: Auth::user()->email)->send(new CreateMotif($motif));
 
@@ -67,23 +72,19 @@ class MotifController extends Controller
             return redirect()->route('motif.index', compact('motifs'));
         }
         abort('403');
-
     }
 
     /**
      * Summary of show
      *
-     *
      * @return void
      */
     public function show(Motif $motif)
     {
-        //
     }
 
     /**
      * Summary of edit
-     *
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
@@ -91,7 +92,6 @@ class MotifController extends Controller
     {
         if (Auth::user()->can('motif-edit')) {
             return view('motif.edit', compact('motif'));
-
         }
         abort('403');
     }
@@ -100,12 +100,12 @@ class MotifController extends Controller
      * Summary of update
      *
      * @param  \Illuminate\Http\Request  $request
+     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function update(MotifRequest $request, Motif $motif)
     {
         if (Auth::user()->can('motif-edit')) {
-
             $oldtitre = $motif->titre;
             $oldaccessible = $motif->is_accessible_salarie;
 
@@ -114,6 +114,8 @@ class MotifController extends Controller
             $motif->is_accessible_salarie = $data['is_accessible'];
 
             $motif->save();
+
+            Cache::forget('motifs_with_trashed');
 
             session()->flash('message', value: ['type' => 'success', 'text' => __('Reason edit successfully.')]);
 
@@ -130,7 +132,6 @@ class MotifController extends Controller
     /**
      * Summary of destroy
      *
-     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function destroy(Motif $motif)
@@ -143,6 +144,9 @@ class MotifController extends Controller
                 $oldaccessible = $motif->is_accessible_salarie;
 
                 $motif->delete();
+
+                Cache::forget('motifs_with_trashed');
+
                 session()->flash('message', value: ['type' => 'success', 'text' => __('Reason delete successfully.')]);
 
                 Mail::to(users: Auth::user()->email)->send(mailable: new DeleteMotif($oldtitre, $oldaccessible));
@@ -155,12 +159,10 @@ class MotifController extends Controller
             return redirect()->route('motif.index', compact('motifs'));
         }
         abort('403');
-
     }
 
     /**
      * Summary of restore
-     *
      *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
@@ -168,6 +170,8 @@ class MotifController extends Controller
     {
         if (Auth::user()->can('motif-delete')) {
             $motif->restore();
+
+            Cache::forget('motifs_with_trashed');
 
             session()->flash('message', value: ['type' => 'success', 'text' => __('Reason restore successfully.')]);
 
@@ -178,6 +182,5 @@ class MotifController extends Controller
             return redirect()->route('motif.index', compact('motifs'));
         }
         abort('403');
-
     }
 }

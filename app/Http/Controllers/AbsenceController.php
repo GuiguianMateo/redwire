@@ -13,6 +13,7 @@ use App\Models\Motif;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Cache;
 
 class AbsenceController extends Controller
 {
@@ -37,59 +38,58 @@ class AbsenceController extends Controller
      */
     public function create()
     {
-        // if (Auth::user()->can('absence-create')) {
-        $users = User::all();
-        $motifs = Motif::all();
-        Absence::all();
+        if (Auth::user()->can('absence-create')) {
+            $users = User::all();
+            $motifs = Motif::all();
+            Absence::all();
 
-        return view('absence.create', compact('users', 'motifs'));
-        // }
-        // abort('403');
+            return view('absence.create', compact('users', 'motifs'));
+        }
+        abort('403');
     }
 
     /**
      * Summary of store
      *
      * @param  \Illuminate\Http\Request  $request
+     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function store(AbsenceRequest $request)
     {
-        // if (Auth::user()->can('absence-create')) {
+        if (Auth::user()->can('absence-create')) {
 
-        $data = $request->all();
-        $absence = new absence;
+            $data = $request->all();
+            $absence = new absence();
 
-        $absence->user_id = $data['user'];
-        $absence->motif_id = $data['motif'];
-        $absence->date_debut = $data['debut'];
-        $absence->date_fin = $data['fin'];
-        $absence->status = $data['status'];
+            $absence->user_id = $data['user'];
+            $absence->motif_id = $data['motif'];
+            $absence->date_debut = $data['debut'];
+            $absence->date_fin = $data['fin'];
+            $absence->status = $data['status'];
 
-        $absence->save();
+            $absence->save();
 
-        $users = User::all();
-        $motifs = Motif::all();
-        $absences = Absence::all();
-        session()->flash('message', value: ['type' => 'success', 'text' => __('Absence create successfully.')]);
+            $users = User::all();
+            $motifs = Motif::all();
+            $absences = Absence::all();
+            session()->flash('message', value: ['type' => 'success', 'text' => __('Absence create successfully.')]);
 
-        Mail::to(users: Auth::user()->email)->send(mailable: new CreateAbsence($absence));
+            Mail::to(users: Auth::user()->email)->send(mailable: new CreateAbsence($absence));
 
-        return redirect()->route('absence.index', compact('absences', 'motifs', 'users'));
-        // }
-        // abort('403');
+            return redirect()->route('absence.index', compact('absences', 'motifs', 'users'));
+        }
+        abort('403');
     }
 
     /**
      * Summary of show
-     *
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function show(Absence $absence)
     {
         if (Auth::user()->can('absence-show')) {
-
             return view('absence.show', compact('absence'));
         }
         abort('403');
@@ -98,13 +98,11 @@ class AbsenceController extends Controller
     /**
      * Summary of edit
      *
-     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function edit(Absence $absence)
     {
         if (Auth::user()->can('absence-edit')) {
-
             $users = User::all();
             $motifs = Motif::all();
 
@@ -117,12 +115,12 @@ class AbsenceController extends Controller
      * Summary of update
      *
      * @param  \Illuminate\Http\Request  $request
+     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function update(AbsenceRequest $request, Absence $absence)
     {
         if (Auth::user()->can('absence-edit')) {
-
             $oldname = $absence->user->name;
             $oldtitre = $absence->motif->titre;
             $olddebut = $absence->date_debut;
@@ -151,13 +149,11 @@ class AbsenceController extends Controller
     /**
      * Summary of destroy
      *
-     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function destroy(Absence $absence)
     {
         if (Auth::user()->can('absence-delete')) {
-
             $oldname = $absence->user->name;
             $oldtitre = $absence->motif->titre;
             $olddebut = $absence->date_debut;
@@ -178,13 +174,11 @@ class AbsenceController extends Controller
     /**
      * Summary of restore
      *
-     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function restore(Absence $absence)
     {
         if (Auth::user()->can('absence-delete')) {
-
             $absence->restore();
             session()->flash('message', value: ['type' => 'success', 'text' => __('Absence restore successfully.')]);
 
@@ -200,7 +194,6 @@ class AbsenceController extends Controller
     public function demande(Absence $absence)
     {
         if (Auth::user()->isA('admin')) {
-
             $absences = Absence::all();
 
             return view('absence.demande', compact('absences'));
@@ -211,7 +204,6 @@ class AbsenceController extends Controller
     public function status(StatusRequest $request, Absence $absence)
     {
         if (Auth::user()->isA('admin')) {
-
             $data = $request->all();
 
             $absence->status = $data['status'];

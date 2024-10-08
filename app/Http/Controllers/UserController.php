@@ -13,7 +13,6 @@ class UserController extends Controller
     /**
      * Summary of index
      *
-     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index(User $users)
@@ -31,27 +30,27 @@ class UserController extends Controller
      */
     public function create()
     {
-        //
     }
 
     /**
      * Summary of store
      *
      * @param  \Illuminate\Http\Request  $request
+     *
      * @return void
      */
-    public function store(UserRequest $request) {}
+    public function store(UserRequest $request)
+    {
+    }
 
     /**
      * Summary of show
-     *
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function show(User $user)
     {
         if (Auth::user()->isA('admin') || Auth::id() === $user->id) {
-
             $absences = Absence::where('user_id', $user->id)->get();
             $motifs = Motif::all();
 
@@ -59,12 +58,10 @@ class UserController extends Controller
         }
 
         abort(403, 'Unauthorized action.');
-
     }
 
     /**
      * Summary of edit
-     *
      *
      * @return void
      */
@@ -80,13 +77,12 @@ class UserController extends Controller
      * Summary of update
      *
      * @param  \Illuminate\Http\Request  $request
+     *
      * @return void
      */
     public function update(UserRequest $request, User $user)
     {
-
         if (Auth::user()->can(abilities: 'user-edit')) {
-
             $data = $request->all();
 
             $user->name = $data['name'];
@@ -104,7 +100,6 @@ class UserController extends Controller
 
     /**
      * Summary of destroy
-     *
      *
      * @return void
      */
@@ -128,7 +123,6 @@ class UserController extends Controller
     /**
      * Summary of restore
      *
-     *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function restore(User $user)
@@ -142,6 +136,5 @@ class UserController extends Controller
             return redirect()->route('user.index', compact('users'));
         }
         abort('403');
-
     }
 }

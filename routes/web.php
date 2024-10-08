@@ -41,7 +41,6 @@ Route::middleware('auth')->group(function () {
     Route::get('/status/{absence}/status', [AbsenceController::class, 'status'])->name('absence.status');
 
     Route::get('language/{code_iso}', [LanguageController::class, 'change'])->name('language.change');
-
 });
 
 require __DIR__.'/auth.php';
