@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\Absence;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -17,7 +16,7 @@ class EditAbsence extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public Absence $absence, public $oldname,  public $oldtitre, public $olddebut, public $oldfin)
+    public function __construct(public Absence $absence, public $oldname, public $oldtitre, public $olddebut, public $oldfin)
     {
         $this->absence = $absence;
         $this->oldname = $oldname;
@@ -43,7 +42,7 @@ class EditAbsence extends Mailable
     {
         return new Content(
             view: 'mail.absence.edit',
-            with:['absence' => $this->absence, 'oldname' => $this->oldname, 'oldtitre' => $this->oldtitre, 'olddebut' => $this->olddebut, 'oldfin' => $this->oldfin],
+            with: ['absence' => $this->absence, 'oldname' => $this->oldname, 'oldtitre' => $this->oldtitre, 'olddebut' => $this->olddebut, 'oldfin' => $this->oldfin],
         );
     }
 

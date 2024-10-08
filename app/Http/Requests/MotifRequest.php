@@ -16,13 +16,12 @@ class MotifRequest extends FormRequest
 
     /**
      * Summary of rules
-     *
-     * @return array
      */
     public function rules(): array
     {
         $rules['titre'] = 'required|string|max:30';
         $rules['is_accessible'] = 'required|boolean';
+
         return $rules;
     }
 }

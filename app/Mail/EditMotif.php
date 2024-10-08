@@ -16,7 +16,7 @@ class EditMotif extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public Motif $motif, public $oldtitre,  public $oldaccessible)
+    public function __construct(public Motif $motif, public $oldtitre, public $oldaccessible)
     {
         $this->motif = $motif;
         $this->oldtitre = $oldtitre;
@@ -40,7 +40,7 @@ class EditMotif extends Mailable
     {
         return new Content(
             view: 'mail.motif.edit',
-            with:['motif' => $this->motif, 'oldtitre' => $this->oldtitre, 'oldaccessible' => $this->oldaccessible],
+            with: ['motif' => $this->motif, 'oldtitre' => $this->oldtitre, 'oldaccessible' => $this->oldaccessible],
         );
     }
 

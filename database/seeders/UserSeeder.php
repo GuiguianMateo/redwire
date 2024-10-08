@@ -35,7 +35,6 @@ class UserSeeder extends Seeder
 
         Bouncer::assign('admin')->to($admin);
 
-
         $salarie = User::create([
             'name' => 'salarie',
             'email' => 'salarie@gmail.com',
@@ -49,7 +48,6 @@ class UserSeeder extends Seeder
         ]);
 
         Bouncer::assign('salarie')->to($salarie);
-
 
         User::factory()
             ->count(15)

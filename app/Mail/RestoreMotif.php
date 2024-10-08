@@ -4,7 +4,6 @@ namespace App\Mail;
 
 use App\Models\Motif;
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -39,7 +38,7 @@ class RestoreMotif extends Mailable
     {
         return new Content(
             view: 'mail.motif.restore',
-            with:['motif' => $this->motif],
+            with: ['motif' => $this->motif],
         );
     }
 
