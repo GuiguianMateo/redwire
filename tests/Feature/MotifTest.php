@@ -15,4 +15,11 @@ class MotifTest extends TestCase
 
         $response->assertRedirect('/login');
     }
+
+    public function test_user_without_ability_cant_access_at_motif(): void
+    {
+        $response = $this->get('/motif');
+
+        $response->assertRedirect('/login');
+    }
 }
