@@ -24,9 +24,17 @@ class AbsenceController extends Controller
      */
     public function index()
     {
-        $users = User::withTrashed()->get();
-        $motifs = Motif::withTrashed()->get();
-        $absences = Absence::withTrashed()->get();
+        $users = Cache::remember('users_with_trashed', 60 * 60 * 24, function () {
+            return User::withTrashed()->get();
+        });
+
+        $motifs = Cache::remember('motifs_with_trashed', 60 * 60 * 24, function () {
+            return Motif::withTrashed()->get();
+        });
+
+        $absences = Cache::remember('absences_with_trashed', 60 * 60 * 24, function () {
+            return Absence::withTrashed()->get();
+        });
 
         return view('absence.index', compact('absences', 'users', 'motifs'));
     }
@@ -38,14 +46,12 @@ class AbsenceController extends Controller
      */
     public function create()
     {
-        if (Auth::user()->can('absence-create')) {
-            $users = User::all();
-            $motifs = Motif::all();
-            Absence::all();
+        $users = User::all();
+        $motifs = Motif::all();
+        Absence::all();
 
-            return view('absence.create', compact('users', 'motifs'));
-        }
-        abort('403');
+        return view('absence.create', compact('users', 'motifs'));
+
     }
 
     /**
@@ -57,29 +63,29 @@ class AbsenceController extends Controller
      */
     public function store(AbsenceRequest $request)
     {
-        if (Auth::user()->can('absence-create')) {
+        $data = $request->all();
+        $absence = new absence();
 
-            $data = $request->all();
-            $absence = new absence();
+        $absence->user_id = $data['user'];
+        $absence->motif_id = $data['motif'];
+        $absence->date_debut = $data['debut'];
+        $absence->date_fin = $data['fin'];
+        $absence->status = $data['status'];
 
-            $absence->user_id = $data['user'];
-            $absence->motif_id = $data['motif'];
-            $absence->date_debut = $data['debut'];
-            $absence->date_fin = $data['fin'];
-            $absence->status = $data['status'];
+        $absence->save();
 
-            $absence->save();
+        Cache::forget('absences_with_trashed');
+        Cache::forget('users_with_trashed');
+        Cache::forget('motifs_with_trashed');
 
-            $users = User::all();
-            $motifs = Motif::all();
-            $absences = Absence::all();
-            session()->flash('message', value: ['type' => 'success', 'text' => __('Absence create successfully.')]);
+        $users = User::all();
+        $motifs = Motif::all();
+        $absences = Absence::all();
+        session()->flash('message', value: ['type' => 'success', 'text' => __('Absence create successfully.')]);
 
-            Mail::to(users: Auth::user()->email)->send(mailable: new CreateAbsence($absence));
+        Mail::to(users: Auth::user()->email)->send(mailable: new CreateAbsence($absence));
 
-            return redirect()->route('absence.index', compact('absences', 'motifs', 'users'));
-        }
-        abort('403');
+        return redirect()->route('absence.index', compact('absences', 'motifs', 'users'));
     }
 
     /**
@@ -134,6 +140,10 @@ class AbsenceController extends Controller
 
             $absence->save();
 
+            Cache::forget('absences_with_trashed');
+            Cache::forget('users_with_trashed');
+            Cache::forget('motifs_with_trashed');
+
             $users = User::all();
             $motifs = Motif::all();
             $absences = Absence::all();
@@ -163,6 +173,10 @@ class AbsenceController extends Controller
             $absence->delete();
             Mail::to(users: Auth::user()->email)->send(new DeleteAbsence($absence, $oldname, $oldtitre, $olddebut, $oldfin, $oldstatus));
 
+            Cache::forget('absences_with_trashed');
+            Cache::forget('users_with_trashed');
+            Cache::forget('motifs_with_trashed');
+
             $absences = Absence::all();
             session()->flash('message', value: ['type' => 'success', 'text' => __('Absence delete successfully.')]);
 
@@ -178,12 +192,15 @@ class AbsenceController extends Controller
      */
     public function restore(Absence $absence)
     {
-        if (Auth::user()->can('absence-delete')) {
+        if (Auth::user()->can('absence-restore')) {
             $absence->restore();
             session()->flash('message', value: ['type' => 'success', 'text' => __('Absence restore successfully.')]);
 
-            Mail::to(users: Auth::user()->email)->send(new RestoreAbsence($absence));
+            Cache::forget('absences_with_trashed');
+            Cache::forget('users_with_trashed');
+            Cache::forget('motifs_with_trashed');
 
+            Mail::to(users: Auth::user()->email)->send(new RestoreAbsence($absence));
             $absences = Absence::all();
 
             return redirect()->route('absence.index', compact('absences'));
@@ -207,10 +224,11 @@ class AbsenceController extends Controller
             $data = $request->all();
 
             $absence->status = $data['status'];
-
             $absence->save();
-            $absences = Absence::all();
 
+            Cache::forget('absences_with_trashed');
+
+            $absences = Absence::all();
             return view('absence.demande', compact('absences'));
         }
         abort('403');

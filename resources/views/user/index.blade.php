@@ -38,7 +38,7 @@
                                     </form>
                                 @endcan
                             @else
-                                @can('user-delete')
+                                @can('user-restore')
                                     <form action="{{ route('user.restore', $user) }}" method="post">
                                         @csrf @method('GET')
                                         <button type="submit" class="flex justify-center gap-2 p-2 px-5 rounded bg-purple-300">{{ __('Restore') }}</button>

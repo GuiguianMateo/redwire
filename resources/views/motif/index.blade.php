@@ -49,7 +49,7 @@
                                         </form>
                                     @endcan
                                 @else
-                                    @can('motif-delete')
+                                    @can('motif-restore')
                                         <form action="{{ route('motif.restore', $motif) }}" method="post">
                                             @csrf
                                             @method('GET')

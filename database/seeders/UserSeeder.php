@@ -23,14 +23,17 @@ class UserSeeder extends Seeder
             'motif-show',
             'motif-edit',
             'motif-delete',
+            'motif-restore',
             'absence-create',
             'absence-show',
             'absence-edit',
             'absence-delete',
+            'absence-restore',
             'user-create',
             'user-show',
             'user-edit',
             'user-delete',
+            'user-restore',
         ]);
 
         Bouncer::assign('admin')->to($admin);

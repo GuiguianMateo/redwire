@@ -7,6 +7,7 @@ use App\Models\Absence;
 use App\Models\Motif;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
@@ -17,10 +18,13 @@ class UserController extends Controller
      */
     public function index(User $users)
     {
-        //$users = User::all();
-        $users = User::withTrashed()->get();
+        $users = Cache::remember('users_with_trashed', 60 * 60 * 24, function () {
+            return User::withTrashed()->get();
+        });
 
-        return view('User.index', compact('users'));
+        return view('user.index', compact('users'));
+
+
     }
 
     /**
@@ -89,6 +93,9 @@ class UserController extends Controller
             $user->email = $data['email'];
 
             $user->save();
+
+            Cache::forget('users_with_trashed');
+
             session()->flash('message', value: ['type' => 'success', 'text' => __('User edit successfully.')]);
 
             $users = User::all();
@@ -110,6 +117,9 @@ class UserController extends Controller
 
             if ($nb === 0) {
                 $user->delete();
+
+                Cache::forget('users_with_trashed');
+
                 session()->flash('message', value: ['type' => 'success', 'text' => __('User deleted successfully.')]);
             } else {
                 session()->flash(key: 'message', value: ['type' => 'error', 'text' => __('The user is still in use with :count absence(s).', ['count' => $nb])]);
@@ -127,9 +137,11 @@ class UserController extends Controller
      */
     public function restore(User $user)
     {
-        if (Auth::user()->can('user-delete')) {
+        if (Auth::user()->can('user-restore')) {
             $user->restore();
             $users = User::all();
+
+            Cache::forget('users_with_trashed');
 
             session()->flash('message', value: ['type' => 'success', 'text' => __('User restore successfully.')]);
 

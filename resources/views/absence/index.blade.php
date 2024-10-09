@@ -51,7 +51,7 @@
                                     </form>
                                 @endcan
                             @else
-                                @can('absence-delete')
+                                @can('absence-restore')
                                     <form action="{{ route('absence.restore', $absence) }}" method="post">
                                         @csrf
                                         @method('GET')

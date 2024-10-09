@@ -168,7 +168,7 @@ class MotifController extends Controller
      */
     public function restore(Motif $motif)
     {
-        if (Auth::user()->can('motif-delete')) {
+        if (Auth::user()->can('motif-restore')) {
             $motif->restore();
 
             Cache::forget('motifs_with_trashed');
