@@ -25,11 +25,7 @@ class MotifTest extends TestCase
         Bouncer::allow('admin')->to('motif-restore');
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Tests pour MotifController
-    |--------------------------------------------------------------------------
-    */
+    //Tests pour MotifController
 
 
     public function test_non_connected_user_cannot_access_motif_index()
@@ -38,8 +34,9 @@ class MotifTest extends TestCase
         $response->assertRedirect(route('login'));
     }
 
+    //Tests utilisateur sans role
 
-    public function test_user_without_role_cannot_access_motif_index()
+    public function test_user_without_role_can_access_motif_index()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -115,7 +112,7 @@ class MotifTest extends TestCase
     }
 
 
-    public function user_without_role_cannot_access_restore()
+    public function test_user_without_role_cannot_restore_motif()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -126,6 +123,9 @@ class MotifTest extends TestCase
         $response = $this->get(route('motif.restore', $motif->id));
         $response->assertStatus(403);
     }
+
+
+    //Tests utilisateur avec role
 
 
     public function test_user_with_role_can_access_motif_create()
@@ -227,6 +227,23 @@ class MotifTest extends TestCase
     }
 
 
+    public function test_user_with_role_cannot_destroy_motif_has_ForeightKey()
+    {
+        $user = User::factory()->create();
+        $motif = Motif::factory()->create();
+        $absence = Absence::factory()->create(['motif_id' => $motif->id]);
+
+        Bouncer::assign('admin')->to($user);
+        Bouncer::refresh();
+        $this->actingAs($user);
+
+        $response = $this->delete(route('motif.destroy', $motif->id));
+        $response->assertRedirect(route('motif.index'));
+
+        $this->assertNull($motif->deleted_at);
+    }
+
+
     public function test_user_with_role_can_restore_motif()
     {
         $user = User::factory()->create();
@@ -238,18 +255,14 @@ class MotifTest extends TestCase
         $motif = Motif::factory()->create();
         $motif->delete();
 
-        $response = $this->get(route('motif.restore', $motif->id)); // Assuming you have a restore route
+        $response = $this->get(route('motif.restore', $motif->id));
         $response->assertRedirect(route('motif.index'));
         $this->assertDatabaseHas('motifs', [
             'id' => $motif->id,
         ]);
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Tests pour le modèle Motif
-    |--------------------------------------------------------------------------
-    */
+    //Tests pour MotifModel
 
 
     public function test_motif_has_many_absences()

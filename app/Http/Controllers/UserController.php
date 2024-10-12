@@ -24,7 +24,6 @@ class UserController extends Controller
 
         return view('user.index', compact('users'));
 
-
     }
 
     /**
@@ -32,9 +31,9 @@ class UserController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function create()
-    {
-    }
+    // public function create()
+    // {
+    // }
 
     /**
      * Summary of store
@@ -43,9 +42,9 @@ class UserController extends Controller
      *
      * @return void
      */
-    public function store(UserRequest $request)
-    {
-    }
+    // public function store(UserRequest $request)
+    // {
+    // }
 
     /**
      * Summary of show

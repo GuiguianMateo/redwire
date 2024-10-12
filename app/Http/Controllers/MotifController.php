@@ -79,9 +79,9 @@ class MotifController extends Controller
      *
      * @return void
      */
-    public function show(Motif $motif)
-    {
-    }
+    // public function show(Motif $motif)
+    // {
+    // }
 
     /**
      * Summary of edit

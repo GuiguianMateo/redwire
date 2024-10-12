@@ -229,7 +229,7 @@ class AbsenceController extends Controller
             Cache::forget('absences_with_trashed');
 
             $absences = Absence::all();
-            return view('absence.demande', compact('absences'));
+            return redirect()->route('absence.demande', compact('absences'));
         }
         abort('403');
     }
