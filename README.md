@@ -8,18 +8,54 @@
 </p>
 
 # README
+## InstallationPour réaliser une mise en place de l'application, vous devez avoir pré installer <a href="https://www.virtualbox.org/wiki/Downloads">Virtual Box</a>, <a href="https://developer.hashicorp.com/vagrant/install?product_intent=vagrant">Vagrant</a>, <a href="https://getcomposer.org/download">Composer</a>, ainsi que <a href="https://www.php.net/downloads">PHP</a>, <a href="https://nodejs.org/en">Node JS</a> et <a href="https://git-scm.com/downloads">Git</a>
+
 ## Mise en Place
 ### Importation du projet
 
 Dans le dossier de votre choix, vous allez ouvrir git bash et y insérer la commande :
 
-    git clone https://github.com/GuiguianMateo/Laravel-10-Blanc.git
+    git clone https://github.com/GuiguianMateo/redwire.git
     
 ### Téléchargement des fichiers suplémentaires
 
 Après avoir installé votre project, il vous sufit de l'ouvrir depuis un IDE et d'y inséré dans un terminal :
 
     composer install
+
+allez dans le répertoire homestead
+
+    C:\Users\UserName> cd homestead
+    C:\Users\UserName\Homestead> vagrant up
+    C:\Users\UserName\Homestead> vagrant ssh
+    vagrant@homestead:~$ cd code/redwire
+    vagrant@homestead:~/code/redwire$
+    
+### Accès
+
+Vous trouverez dans le fichier homestead.yaml à la racine du dossier Homestead quelque chose de similaire : 
+    
+    sites:
+      - map: projet.test
+        to: /home/vagrant/code/projet/public
+
+    databases:
+      - projet
+      - projet_example
+
+Et vous y rajouterez ceci
+
+      - map: redwire.test
+        to: /home/vagrant/code/redwire/public
+...
+
+      - redwire
+      - redwire_example
+
+
+Et dans le fichier host du répertoire : C:\Windows\System32\drivers\etc , vous y ajouterez cette ligne
+
+    192.168.56.56 redwire.test
 
 ### Connexion
 
@@ -30,73 +66,27 @@ Et vous le collerez dans le fichier .env
 Ensuite vous allez y modifier :
 
     DB_CONNECTION=mysql
-    DB_HOST=127.0.0.1
+    DB_HOST=192.168.56.56
     DB_PORT=3306
     DB_DATABASE=redwire
-    DB_USERNAME=root
-    DB_PASSWORD=
+    DB_USERNAME=homestead
+    DB_PASSWORD=secret
 
 ### Terminal
-Dans un tereminal de votre IDE vous allez pouvoir lancez ces commandes :
+Dans le même tereminal précédent, lancez ces commandes :
 
-    php artisan migrate
-
+     art migrate
+     
 Si un message vous demande de créé la base de donnée, vous selectionnez "yes"
 
-### Tinker
-
-Ensuite nous allons entrez dans Tinker
-
-    php artisan tinker
-
-Créeation des utilisateurs
-
-    User::create(["name"=> "Admin","email"=>"admin@gmail.com","password"=>bcrypt("adminadmin")]);
-    User::create(["name"=> "User","email"=>"user@gmail.com","password"=>bcrypt("useruser")]);
-
-Ensuite la création des roles et leurs abilities
-
-    Bouncer::allow('admin')->to('motif-create');
-    Bouncer::allow('admin')->to('motif-show');
-    Bouncer::allow('admin')->to('motif-edit');
-    Bouncer::allow('admin')->to('motif-delete');
-    
-    Bouncer::allow('admin')->to('absence-create');
-    Bouncer::allow('admin')->to('absence-show');
-    Bouncer::allow('admin')->to('absence-edit');
-    Bouncer::allow('admin')->to('absence-delete');
-    
-    Bouncer::allow('admin')->to('user-create');
-    Bouncer::allow('admin')->to('user-show');
-    Bouncer::allow('admin')->to('user-edit');
-    Bouncer::allow('admin')->to('user-delete');
-    
-    Bouncer::allow('salarie')->to('absence-create');
-    Bouncer::allow('salarie')->to('absence-show');
-    Bouncer::allow('salarie')->to('user-show');
-
-Puis assigner les roles aux utilisateurs
-
-    $user = User::find(1);
-    Bouncer::assign('admin')->to($user);
-
-    $user = User::find(2);
-    Bouncer::assign('salarie')->to($user);
-
-### Base de donnée
-
-Vous allez grâce à la commande suivante, peupler votre base de donnée
-
-   php artisan db:seed
+     art db:seed
 
 ## Lancement du projet  
-Pour finaliserla mise en place du projet, vous allez activez l'application
 
-    php artisan serve
-
-Ainsi que la commande suivante pour faire fonctioner les scrips JS 
-
+    npm install vite
     npm run dev
+
+cette commande est uniquement nécéssaire si vous vous retrouvez face à un problème d'affichage
 
 ### Connexion au comptes
 Connectez-vous avec le compte que vous souaiter
