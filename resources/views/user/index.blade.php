@@ -25,9 +25,7 @@
                         <div class="min-w-40 my-auto text-center">{{ $user->name }}</div>
                         <div class="flex gap-2">
                             @if ($user->deleted_at === null)
-                                @can('user-show')
-                                    <a class="flex justify-center gap-2 p-2 px-5 rounded bg-blue-300" href="{{ route('user.show', $user) }}">{{ __('Details') }}</a>
-                                @endcan
+                                <a class="flex justify-center gap-2 p-2 px-5 rounded bg-blue-300" href="{{ route('user.show', $user) }}">{{ __('Details') }}</a>
                                 @can('user-edit')
                                     <a class="flex justify-center gap-2 p-2 px-5 rounded bg-orange-300" href="{{ route('user.edit', $user) }}">{{ __('Edit') }}</a>
                                 @endcan
@@ -38,7 +36,7 @@
                                     </form>
                                 @endcan
                             @else
-                                @can('user-delete')
+                                @can('user-restore')
                                     <form action="{{ route('user.restore', $user) }}" method="post">
                                         @csrf @method('GET')
                                         <button type="submit" class="flex justify-center gap-2 p-2 px-5 rounded bg-purple-300">{{ __('Restore') }}</button>

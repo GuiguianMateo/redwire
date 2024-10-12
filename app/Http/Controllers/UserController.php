@@ -3,27 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRequest;
-use Illuminate\Support\Facades\Auth;
 use App\Models\Absence;
 use App\Models\Motif;
 use App\Models\User;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 
 class UserController extends Controller
 {
     /**
      * Summary of index
      *
-     * @param \App\Models\User $users
-     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index(User $users)
     {
-        //$users = User::all();
-        $users = User::withTrashed()->get();
+        $users = Cache::remember('users_with_trashed', 60 * 60 * 24, function () {
+            return User::withTrashed()->get();
+        });
 
-        return view('User.index', compact('users'));
+        return view('user.index', compact('users'));
+
     }
 
     /**
@@ -31,33 +31,29 @@ class UserController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function create()
-    {
-        //
-    }
+    // public function create()
+    // {
+    // }
 
     /**
      * Summary of store
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      *
      * @return void
      */
-    public function store(UserRequest $request)
-    {
-    }
+    // public function store(UserRequest $request)
+    // {
+    // }
 
     /**
      * Summary of show
-     *
-     * @param \App\Models\User $user
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function show(User $user)
     {
         if (Auth::user()->isA('admin') || Auth::id() === $user->id) {
-
             $absences = Absence::where('user_id', $user->id)->get();
             $motifs = Motif::all();
 
@@ -65,19 +61,16 @@ class UserController extends Controller
         }
 
         abort(403, 'Unauthorized action.');
-
     }
 
     /**
      * Summary of edit
      *
-     * @param \App\Models\User $user
-     *
      * @return void
      */
     public function edit(User $user)
     {
-        if(Auth::user()->can('user-edit')){
+        if (Auth::user()->can('user-edit')) {
             return view('user.edit', compact('user'));
         }
         abort('403');
@@ -86,26 +79,27 @@ class UserController extends Controller
     /**
      * Summary of update
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\User $user
+     * @param  \Illuminate\Http\Request  $request
      *
      * @return void
      */
     public function update(UserRequest $request, User $user)
     {
-
         if (Auth::user()->can(abilities: 'user-edit')) {
-
             $data = $request->all();
 
             $user->name = $data['name'];
             $user->email = $data['email'];
 
             $user->save();
-            session()->flash('message',value: ['type' => 'success', 'text' => __("User edit successfully.")]);
+
+            Cache::forget('users_with_trashed');
+
+            session()->flash('message', value: ['type' => 'success', 'text' => __('User edit successfully.')]);
 
             $users = User::all();
-            return redirect()->route('user.index', compact( 'users'));
+
+            return redirect()->route('user.index', compact('users'));
         }
         abort('403');
     }
@@ -113,20 +107,21 @@ class UserController extends Controller
     /**
      * Summary of destroy
      *
-     * @param \App\Models\User $user
-     *
      * @return void
      */
     public function destroy(User $user)
     {
-        if(Auth::user()->can('user-delete')){
+        if (Auth::user()->can('user-delete')) {
             $nb = Absence::where('user_id', $user->id)->count();
 
             if ($nb === 0) {
                 $user->delete();
-                session()->flash('message',value: ['type' => 'success', 'text' => __("User deleted successfully.")]);
+
+                Cache::forget('users_with_trashed');
+
+                session()->flash('message', value: ['type' => 'success', 'text' => __('User deleted successfully.')]);
             } else {
-                session()->flash(key: 'message',value: ['type' => 'error', 'text' => __("The user is still in use with :count absence(s).", ['count' => $nb])]);
+                session()->flash(key: 'message', value: ['type' => 'error', 'text' => __('The user is still in use with :count absence(s).', ['count' => $nb])]);
             }
 
             return redirect()->route('user.index');
@@ -134,25 +129,23 @@ class UserController extends Controller
         abort('403');
     }
 
-
     /**
      * Summary of restore
-     *
-     * @param \App\Models\user $user
      *
      * @return mixed|\Illuminate\Http\RedirectResponse
      */
     public function restore(User $user)
     {
-        if(Auth::user()->can('user-delete')){
+        if (Auth::user()->can('user-restore')) {
             $user->restore();
             $users = User::all();
 
-            session()->flash('message',value: ['type' => 'success', 'text' => __("User restore successfully.")]);
+            Cache::forget('users_with_trashed');
+
+            session()->flash('message', value: ['type' => 'success', 'text' => __('User restore successfully.')]);
 
             return redirect()->route('user.index', compact('users'));
         }
         abort('403');
-
     }
 }

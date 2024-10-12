@@ -3,7 +3,6 @@
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
@@ -16,7 +15,7 @@ class DeleteMotif extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public $oldtitre,  public $oldaccessible)
+    public function __construct(public $oldtitre, public $oldaccessible)
     {
         $this->oldtitre = $oldtitre;
         $this->oldaccessible = $oldaccessible;
@@ -39,7 +38,7 @@ class DeleteMotif extends Mailable
     {
         return new Content(
             view: 'mail.motif.delete',
-            with:['oldtitre' => $this->oldtitre, 'oldaccessible' => $this->oldaccessible],
+            with: ['oldtitre' => $this->oldtitre, 'oldaccessible' => $this->oldaccessible],
         );
     }
 

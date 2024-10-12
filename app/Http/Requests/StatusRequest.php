@@ -22,6 +22,7 @@ class StatusRequest extends FormRequest
     public function rules(): array
     {
         $rules['status'] = 'required|string';
+
         return $rules;
     }
 }
