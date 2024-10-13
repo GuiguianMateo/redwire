@@ -15,10 +15,9 @@ class DeleteMotif extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public $oldtitre, public $oldaccessible)
+    public function __construct(public string $oldtitre, public bool $oldaccessible)
     {
-        $this->oldtitre = $oldtitre;
-        $this->oldaccessible = $oldaccessible;
+        //
     }
 
     /**

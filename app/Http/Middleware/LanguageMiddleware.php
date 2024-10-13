@@ -18,11 +18,16 @@ class LanguageMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // if (session::has('locale')) { Au choix
-        if (session('locale') !== null) {
-            App::setLocale(Session::get('locale'));
+        $locale = Session::get('locale');
+
+        if (is_string($locale) && !empty($locale)) {
+            App::setLocale($locale);
         } else {
-            App::setLocale(Config::get('app.locale'));
+            $defaultLocale = Config::get('app.locale');
+
+            if (is_string($defaultLocale) && !empty($defaultLocale)) {
+                App::setLocale($defaultLocale);
+            }
         }
 
         return $next($request);

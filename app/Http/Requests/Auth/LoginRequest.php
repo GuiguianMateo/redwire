@@ -22,7 +22,7 @@ class LoginRequest extends FormRequest
     /**
      * Get the validation rules that apply to the request.
      *
-     * @return array<string, \Illuminate\Contracts\Validation\Rule|array|string>
+     * @return array<string, array<string>>  Le tableau contient des clés de type string et des valeurs qui sont des tableaux de chaînes.
      */
     public function rules(): array
     {

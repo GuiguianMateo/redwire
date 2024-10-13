@@ -16,11 +16,15 @@ class MotifRequest extends FormRequest
 
     /**
      * Summary of rules
+     *
+     * @return array<string, string>  La clé est le nom du champ et la valeur est la règle de validation.
      */
     public function rules(): array
     {
-        $rules['titre'] = 'required|string|max:30';
-        $rules['is_accessible'] = 'required|boolean';
+        $rules = [
+            'titre' => 'required|string|max:30',
+            'is_accessible' => 'required|boolean',
+        ];
 
         return $rules;
     }

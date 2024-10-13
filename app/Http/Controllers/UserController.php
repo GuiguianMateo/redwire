@@ -8,52 +8,36 @@ use App\Models\Motif;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 
 class UserController extends Controller
 {
     /**
-     * Summary of index
+     * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return View
      */
-    public function index(User $users)
+    public function index(): View
     {
         $users = Cache::remember('users_with_trashed', 60 * 60 * 24, function () {
             return User::withTrashed()->get();
         });
 
         return view('user.index', compact('users'));
-
     }
 
     /**
-     * Summary of create
+     * Show the specified resource.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @param  User  $user
+     * @return View
      */
-    // public function create()
-    // {
-    // }
-
-    /**
-     * Summary of store
-     *
-     * @param  \Illuminate\Http\Request  $request
-     *
-     * @return void
-     */
-    // public function store(UserRequest $request)
-    // {
-    // }
-
-    /**
-     * Summary of show
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
-    public function show(User $user)
+    public function show(User $user): View
     {
-        if (Auth::user()->isA('admin') || Auth::id() === $user->id) {
+        $authUser = Auth::user();
+
+        if ($authUser && ($authUser->isA('admin') || Auth::id() === $user->id)) {
             $absences = Absence::where('user_id', $user->id)->get();
             $motifs = Motif::all();
 
@@ -64,88 +48,96 @@ class UserController extends Controller
     }
 
     /**
-     * Summary of edit
+     * Show the form for editing the specified resource.
      *
-     * @return void
+     * @param  User  $user
+     * @return View
      */
-    public function edit(User $user)
+    public function edit(User $user): View
     {
-        if (Auth::user()->can('user-edit')) {
+        if (Auth::user() && Auth::user()->can('user-edit')) {
             return view('user.edit', compact('user'));
         }
-        abort('403');
+        abort(403);
     }
 
     /**
-     * Summary of update
+     * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     *
-     * @return void
+     * @param  UserRequest  $request
+     * @param  User  $user
+     * @return RedirectResponse
      */
-    public function update(UserRequest $request, User $user)
+    public function update(UserRequest $request, User $user): RedirectResponse
     {
-        if (Auth::user()->can(abilities: 'user-edit')) {
-            $data = $request->all();
+        if (Auth::user() && Auth::user()->can('user-edit')) {
+            $data = $request->validated();
 
-            $user->name = $data['name'];
-            $user->email = $data['email'];
-
+            $user->name = (string) $data['name'];
+            $user->email = (string) $data['email'];
             $user->save();
 
             Cache::forget('users_with_trashed');
 
-            session()->flash('message', value: ['type' => 'success', 'text' => __('User edit successfully.')]);
+            session()->flash('message', [
+                'type' => 'success',
+                'text' => __('User edited successfully.')
+            ]);
 
-            $users = User::all();
-
-            return redirect()->route('user.index', compact('users'));
+            return redirect()->route('user.index');
         }
-        abort('403');
+        abort(403);
     }
 
     /**
-     * Summary of destroy
+     * Remove the specified resource from storage.
      *
-     * @return void
+     * @param  User  $user
+     * @return RedirectResponse
      */
-    public function destroy(User $user)
+    public function destroy(User $user): RedirectResponse
     {
-        if (Auth::user()->can('user-delete')) {
+        if (Auth::user() && Auth::user()->can('user-delete')) {
             $nb = Absence::where('user_id', $user->id)->count();
 
             if ($nb === 0) {
                 $user->delete();
-
                 Cache::forget('users_with_trashed');
-
-                session()->flash('message', value: ['type' => 'success', 'text' => __('User deleted successfully.')]);
+                session()->flash('message', [
+                    'type' => 'success',
+                    'text' => __('User deleted successfully.')
+                ]);
             } else {
-                session()->flash(key: 'message', value: ['type' => 'error', 'text' => __('The user is still in use with :count absence(s).', ['count' => $nb])]);
+                session()->flash('message', [
+                    'type' => 'error',
+                    'text' => __('The user is still in use with :count absence(s).', ['count' => $nb])
+                ]);
             }
 
             return redirect()->route('user.index');
         }
-        abort('403');
+        abort(403);
     }
 
     /**
-     * Summary of restore
+     * Restore the specified resource from storage.
      *
-     * @return mixed|\Illuminate\Http\RedirectResponse
+     * @param  User  $user
+     * @return RedirectResponse
      */
-    public function restore(User $user)
+    public function restore(User $user): RedirectResponse
     {
-        if (Auth::user()->can('user-restore')) {
+        if (Auth::user() && Auth::user()->can('user-restore')) {
             $user->restore();
-            $users = User::all();
-
             Cache::forget('users_with_trashed');
 
-            session()->flash('message', value: ['type' => 'success', 'text' => __('User restore successfully.')]);
+            session()->flash('message', [
+                'type' => 'success',
+                'text' => __('User restored successfully.')
+            ]);
 
-            return redirect()->route('user.index', compact('users'));
+            return redirect()->route('user.index');
         }
-        abort('403');
+        abort(403);
     }
 }
