@@ -16,14 +16,15 @@ class DeleteAbsence extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public Absence $absence, public $oldname, public $oldtitre, public $olddebut, public $oldfin, public $oldstatus)
-    {
-        $this->absence = $absence;
-        $this->oldname = $oldname;
-        $this->oldtitre = $oldtitre;
-        $this->olddebut = $olddebut;
-        $this->oldfin = $oldfin;
-        $this->oldstatus = $oldstatus;
+    public function __construct(
+        public Absence $absence,
+        public string $oldname,
+        public string $oldtitre,
+        public string $olddebut,
+        public string $oldfin,
+        public string $oldstatus
+    ) {
+        //
     }
 
     /**
@@ -32,7 +33,7 @@ class DeleteAbsence extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Supression d\'une Absence',
+            subject: 'Suppression d\'une Absence',
         );
     }
 
@@ -43,7 +44,14 @@ class DeleteAbsence extends Mailable
     {
         return new Content(
             view: 'mail.absence.delete',
-            with: ['absence' => $this->absence, 'oldname' => $this->oldname, 'oldtitre' => $this->oldtitre, 'olddebut' => $this->olddebut, 'oldfin' => $this->oldfin, 'oldstatus' => $this->oldstatus],
+            with: [
+                'absence' => $this->absence,
+                'oldname' => $this->oldname,
+                'oldtitre' => $this->oldtitre,
+                'olddebut' => $this->olddebut,
+                'oldfin' => $this->oldfin,
+                'oldstatus' => $this->oldstatus,
+            ],
         );
     }
 

@@ -2,13 +2,13 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Silber\Bouncer\Database\HasRolesAndAbilities;
+use Illuminate\Database\Eloquent\Relations\HasMany; // Ajoutez cette ligne
 
 /**
  * @property int $id
@@ -91,7 +91,12 @@ class User extends Authenticatable
         'password' => 'hashed',
     ];
 
-    public function absence()
+    /**
+     * Get the absences for the user.
+     *
+     * @return HasMany<Absence>
+     */
+    public function absence(): HasMany
     {
         return $this->hasMany(Absence::class);
     }

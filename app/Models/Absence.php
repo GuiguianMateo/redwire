@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * @property int $id
@@ -41,15 +42,24 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  */
 class Absence extends Model
 {
-    use HasFactory;
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
-    public function user()
+    /**
+     * Get the user that owns the absence.
+     *
+     * @return BelongsTo<User, Absence>
+     */
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function motif()
+    /**
+     * Get the motif associated with the absence.
+     *
+     * @return BelongsTo<Motif, Absence>
+     */
+    public function motif(): BelongsTo
     {
         return $this->belongsTo(Motif::class);
     }

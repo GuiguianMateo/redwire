@@ -63,22 +63,26 @@ class AbsenceTest extends TestCase
 
     public function test_user_without_role_can_store_absence()
     {
-        $usertest = User::factory()->create();
         $motif = Motif::factory()->create();
-
         $user = User::factory()->create();
         $this->actingAs($user);
 
         $data = [
-            'user_id' => $usertest->id,
-            'motif_id' => $motif->id,
+            'user' => $user->id,
+            'motif' => $motif->id,
             'debut' => now(),
             'fin' => now()->addDays(2),
             'status' => 'pending',
         ];
 
         $response = $this->post(route('absence.store'), $data);
-        $response->assertRedirect('absence.index');
+        $response->assertRedirect(route('absence.index'));
+
+        $this->assertDatabaseHas('absences', [
+            'user_id' => $user->id,
+            'motif_id' => $motif->id,
+            'status' => 'pending',
+        ]);
     }
 
 
@@ -116,10 +120,11 @@ class AbsenceTest extends TestCase
         $absence = Absence::factory()->create();
 
         $data = [
-            'user_id' => 1,
-            'motif_id' => 1,
+            'user' => $usertest->id,
+            'motif' => $motif->id,
             'debut' => now(),
             'fin' => now()->addDays(3),
+            'status' => 'validate',
         ];
 
         $response = $this->put(route('absence.update', $absence->id), $data);
@@ -182,7 +187,7 @@ class AbsenceTest extends TestCase
     }
 
 
-    /////////////////////////////////////////////////////////////////////
+    /*Test User with role*/
 
     public function test_user_with_role_can_access_absence_create()
     {
@@ -208,10 +213,11 @@ class AbsenceTest extends TestCase
         $this->actingAs($user);
 
         $data = [
-            'user_id' => $user->id,
-            'motif_id' => $motif->id,
+            'user' => $user->id,
+            'motif' => $motif->id,
             'debut' => now(),
             'fin' => now()->addDays(2),
+            'status' => 'validate',
         ];
 
         $response = $this->post(route('absence.store'), $data);
@@ -220,8 +226,7 @@ class AbsenceTest extends TestCase
         $this->assertDatabaseHas('absences', [
             'user_id' => $user->id,
             'motif_id' => $motif->id,
-            'debut' => $data['debut'],
-            'fin' => $data['fin'],
+            'status' => 'validate',
         ]);
     }
 
@@ -264,13 +269,15 @@ class AbsenceTest extends TestCase
 
         $this->actingAs($user);
 
+        $motif = Motif::factory()->create();
         $absence = Absence::factory()->create();
 
         $data = [
-            'user_id' => 1,
-            'motif_id' => 1,
+            'user' => $user->id,
+            'motif' => $motif->id,
             'debut' => now(),
             'fin' => now()->addDays(3),
+            'status' => 'pending',
         ];
 
         $response = $this->put(route('absence.update', $absence->id), $data);
@@ -278,8 +285,12 @@ class AbsenceTest extends TestCase
 
         $this->assertDatabaseHas('absences', [
             'id' => $absence->id,
-            'fin' => $data['fin'],
-        ]);
+            'user_id' => $user->id,
+            'motif_id' => $motif->id,
+            'date_debut' => now()->format('Y-m-d'),
+            'date_fin' => now()->addDays(3)->format('Y-m-d'),
+            'status' => 'pending',
+       ]);
     }
 
 

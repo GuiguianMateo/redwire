@@ -16,8 +16,11 @@ class EditMotif extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public Motif $motif, public $oldtitre, public $oldaccessible)
-    {
+    public function __construct(
+        public Motif $motif,
+        public string $oldtitre,
+        public bool $oldaccessible
+    ) {
         $this->motif = $motif;
         $this->oldtitre = $oldtitre;
         $this->oldaccessible = $oldaccessible;
@@ -29,7 +32,7 @@ class EditMotif extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mise à jours motif',
+            subject: 'Mise à jour motif',
         );
     }
 
@@ -40,7 +43,11 @@ class EditMotif extends Mailable
     {
         return new Content(
             view: 'mail.motif.edit',
-            with: ['motif' => $this->motif, 'oldtitre' => $this->oldtitre, 'oldaccessible' => $this->oldaccessible],
+            with: [
+                'motif' => $this->motif,
+                'oldtitre' => $this->oldtitre,
+                'oldaccessible' => $this->oldaccessible
+            ],
         );
     }
 

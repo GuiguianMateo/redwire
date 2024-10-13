@@ -16,8 +16,13 @@ class EditAbsence extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(public Absence $absence, public $oldname, public $oldtitre, public $olddebut, public $oldfin)
-    {
+    public function __construct(
+        public Absence $absence,
+        public string $oldname,
+        public string $oldtitre,
+        public string $olddebut,
+        public string $oldfin
+    ) {
         $this->absence = $absence;
         $this->oldname = $oldname;
         $this->oldtitre = $oldtitre;
@@ -31,7 +36,7 @@ class EditAbsence extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Mise à jours absence',
+            subject: 'Mise à jour absence',
         );
     }
 
@@ -42,7 +47,13 @@ class EditAbsence extends Mailable
     {
         return new Content(
             view: 'mail.absence.edit',
-            with: ['absence' => $this->absence, 'oldname' => $this->oldname, 'oldtitre' => $this->oldtitre, 'olddebut' => $this->olddebut, 'oldfin' => $this->oldfin],
+            with: [
+                'absence' => $this->absence,
+                'oldname' => $this->oldname,
+                'oldtitre' => $this->oldtitre,
+                'olddebut' => $this->olddebut,
+                'oldfin' => $this->oldfin
+            ],
         );
     }
 

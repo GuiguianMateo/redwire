@@ -9,6 +9,8 @@ use App\Mail\EditMotif;
 use App\Mail\RestoreMotif;
 use App\Models\Absence;
 use App\Models\Motif;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Mail;
@@ -16,11 +18,11 @@ use Illuminate\Support\Facades\Mail;
 class MotifController extends Controller
 {
     /**
-     * Summary of index
+     * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return View
      */
-    public function index()
+    public function index(): View
     {
         $motifs = Cache::remember('motifs_with_trashed', 60 * 60 * 24, function () {
             return Motif::withTrashed()->get();
@@ -30,157 +32,154 @@ class MotifController extends Controller
     }
 
     /**
-     * Summary of create
+     * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return View
      */
-    public function create()
+    public function create(): View
     {
-        if (Auth::user()->can('motif-create')) {
-            Motif::all();
-
+        $user = Auth::user();
+        if ($user && $user->can('motif-create')) {
             return view('motif.create');
         }
-        abort('403');
-    }
-
-    /**
-     * Summary of store
-     *
-     * @param  \Illuminate\Http\Request  $request
-     *
-     * @return mixed|\Illuminate\Http\RedirectResponse
-     */
-    public function store(MotifRequest $request)
-    {
-        if (Auth::user()->can('motif-create')) {
-            $data = $request->all();
-            $motif = new motif();
-
-            $motif->titre = $data['titre'];
-            $motif->is_accessible_salarie = $data['is_accessible'];
-
-            $motif->save();
-
-            Cache::forget('motifs_with_trashed');
-
-            Mail::to(users: Auth::user()->email)->send(new CreateMotif($motif));
-
-            session()->flash('message', value: ['type' => 'success', 'text' => __('Reason create successfully.')]);
-            $motifs = Motif::all();
-
-            return redirect()->route('motif.index', compact('motifs'));
-        }
-        abort('403');
-    }
-
-    /**
-     * Summary of show
-     *
-     * @return void
-     */
-    // public function show(Motif $motif)
-    // {
-    // }
-
-    /**
-     * Summary of edit
-     *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
-     */
-    public function edit(Motif $motif)
-    {
-        if (Auth::user()->can('motif-edit')) {
-            return view('motif.edit', compact('motif'));
-        }
-        abort('403');
-    }
-
-    /**
-     * Summary of update
-     *
-     * @param  \Illuminate\Http\Request  $request
-     *
-     * @return mixed|\Illuminate\Http\RedirectResponse
-     */
-    public function update(MotifRequest $request, Motif $motif)
-    {
-        if (Auth::user()->can('motif-edit')) {
-            $oldtitre = $motif->titre;
-            $oldaccessible = $motif->is_accessible_salarie;
-
-            $data = $request->all();
-            $motif->titre = $data['titre'];
-            $motif->is_accessible_salarie = $data['is_accessible'];
-
-            $motif->save();
-
-            Cache::forget('motifs_with_trashed');
-
-            session()->flash('message', value: ['type' => 'success', 'text' => __('Reason edit successfully.')]);
-
-            Mail::to(users: Auth::user()->email)->send(new EditMotif($motif, $oldtitre, $oldaccessible));
-
-            $motifs = Motif::all();
-
-            return redirect()->route('motif.index', compact('motifs'));
-        }
-
         abort(403);
     }
 
     /**
-     * Summary of destroy
+     * Store a newly created resource in storage.
      *
-     * @return mixed|\Illuminate\Http\RedirectResponse
+     * @param  MotifRequest  $request
+     * @return RedirectResponse
      */
-    public function destroy(Motif $motif)
+    public function store(MotifRequest $request): RedirectResponse
     {
-        if (Auth::user()->can('motif-delete')) {
+        $user = Auth::user();
+        if ($user && $user->can('motif-create')) {
+            $data = $request->validated();
+
+            // Assurer que les données sont bien typées
+            $titre = isset($data['titre']) ? (string) $data['titre'] : '';
+            // Convertir en entier 0 ou 1
+            $isAccessible = isset($data['is_accessible']) && $data['is_accessible'] ? 1 : 0;
+
+            $motif = new Motif();
+            $motif->titre = $titre;
+            $motif->is_accessible_salarie = $isAccessible; // La propriété doit être un int
+            $motif->save();
+
+            Cache::forget('motifs_with_trashed');
+
+            Mail::to($user->email)->send(new CreateMotif($motif));
+
+            session()->flash('message', ['type' => 'success', 'text' => __('Reason created successfully.')]);
+            return redirect()->route('motif.index');
+        }
+        abort(403);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  Motif  $motif
+     * @return View
+     */
+    public function edit(Motif $motif): View
+    {
+        $user = Auth::user();
+        if ($user && $user->can('motif-edit')) {
+            return view('motif.edit', compact('motif'));
+        }
+        abort(403);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  MotifRequest  $request
+     * @param  Motif  $motif
+     * @return RedirectResponse
+     */
+    public function update(MotifRequest $request, Motif $motif): RedirectResponse
+    {
+        $user = Auth::user();
+        if ($user && $user->can('motif-edit')) {
+            $oldtitre = $motif->titre;
+            $oldaccessible = (bool) $motif->is_accessible_salarie; // Convertir en booléen
+
+            $data = $request->validated();
+
+            // Assurer que les données sont bien typées
+            $titre = isset($data['titre']) ? (string) $data['titre'] : '';
+            // Convertir en entier 0 ou 1
+            $isAccessible = isset($data['is_accessible']) && $data['is_accessible'] ? 1 : 0;
+
+            $motif->titre = $titre;
+            $motif->is_accessible_salarie = $isAccessible; // La propriété doit être un int
+            $motif->save();
+
+            Cache::forget('motifs_with_trashed');
+
+            // On passe oldaccessible comme booléen
+            Mail::to($user->email)->send(new EditMotif($motif, $oldtitre, $oldaccessible));
+
+            session()->flash('message', ['type' => 'success', 'text' => __('Reason edited successfully.')]);
+            return redirect()->route('motif.index');
+        }
+        abort(403);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  Motif  $motif
+     * @return RedirectResponse
+     */
+    public function destroy(Motif $motif): RedirectResponse
+    {
+        $user = Auth::user();
+        if ($user && $user->can('motif-delete')) {
             $nb = Absence::where('motif_id', $motif->id)->count();
 
             if ($nb === 0) {
                 $oldtitre = $motif->titre;
-                $oldaccessible = $motif->is_accessible_salarie;
+                $oldaccessible = (bool) $motif->is_accessible_salarie; // Convertir en booléen
 
                 $motif->delete();
 
                 Cache::forget('motifs_with_trashed');
 
-                session()->flash('message', value: ['type' => 'success', 'text' => __('Reason delete successfully.')]);
+                // On passe oldaccessible comme booléen
+                Mail::to($user->email)->send(new DeleteMotif($oldtitre, $oldaccessible));
 
-                Mail::to(users: Auth::user()->email)->send(mailable: new DeleteMotif($oldtitre, $oldaccessible));
+                session()->flash('message', ['type' => 'success', 'text' => __('Reason deleted successfully.')]);
             } else {
-                session()->flash('message', value: ['type' => 'error', 'text' => __('The reason is still in use with :count absence(s).', ['count' => $nb])]);
+                session()->flash('message', ['type' => 'error', 'text' => __('The reason is still in use with :count absence(s).', ['count' => $nb])]);
             }
 
-            $motifs = Motif::all();
-
-            return redirect()->route('motif.index', compact('motifs'));
+            return redirect()->route('motif.index');
         }
-        abort('403');
+        abort(403);
     }
 
     /**
-     * Summary of restore
+     * Restore the specified resource from storage.
      *
-     * @return mixed|\Illuminate\Http\RedirectResponse
+     * @param  Motif  $motif
+     * @return RedirectResponse
      */
-    public function restore(Motif $motif)
+    public function restore(Motif $motif): RedirectResponse
     {
-        if (Auth::user()->can('motif-restore')) {
+        $user = Auth::user();
+        if ($user && $user->can('motif-restore')) {
             $motif->restore();
 
             Cache::forget('motifs_with_trashed');
 
-            session()->flash('message', value: ['type' => 'success', 'text' => __('Reason restore successfully.')]);
+            Mail::to($user->email)->send(new RestoreMotif($motif));
 
-            Mail::to(users: Auth::user()->email)->send(new RestoreMotif($motif));
-
-            $motifs = Motif::all();
-
-            return redirect()->route('motif.index', compact('motifs'));
+            session()->flash('message', ['type' => 'success', 'text' => __('Reason restored successfully.')]);
+            return redirect()->route('motif.index');
         }
-        abort('403');
+        abort(403);
     }
 }
