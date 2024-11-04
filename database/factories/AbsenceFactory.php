@@ -22,7 +22,7 @@ class AbsenceFactory extends Factory
             'user_id' => User::factory()->create()->id,
             'motif_id' => Motif::factory()->create()->id,
             'date_debut' => $this->faker->date(),
-            'date_fin' => $this->faker->date(),
+            'date_fin' => $this->faker->dateTimeBetween($date_debut, 'now'),
         ];
     }
 }
