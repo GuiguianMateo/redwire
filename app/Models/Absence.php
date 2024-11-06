@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Carbon\Carbon;
 
 /**
  * @property int $id
@@ -62,5 +63,35 @@ class Absence extends Model
     public function motif(): BelongsTo
     {
         return $this->belongsTo(Motif::class);
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($absence) {
+            $absence->updateUserConge();
+        });
+
+        static::updated(function ($absence) {
+            $absence->updateUserConge();
+        });
+    }
+
+    public function updateUserConge()
+    {
+        $user = $this->user;
+
+        // Calculer la différence en jours entre `date_debut` et `date_fin`
+        $joursPris = Carbon::parse($this->date_debut)->diffInDays(Carbon::parse($this->date_fin)) + 1;
+
+        // Récupérer tous les jours pris pour cet utilisateur
+        $joursTotalPris = $user->absence->sum(function ($absence) {
+            return Carbon::parse($absence->date_debut)->diffInDays(Carbon::parse($absence->date_fin)) + 1;
+        });
+
+        // Calculer les jours restants
+        $user->jours_conge = max(0, $user->jours_conge_initial - $joursTotalPris);
+
+        // Sauvegarder l'utilisateur avec les jours restants
+        $user->save();
     }
 }
