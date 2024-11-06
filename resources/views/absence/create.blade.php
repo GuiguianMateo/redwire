@@ -1,6 +1,21 @@
 @extends('layouts.app')
 
 @section('content')
+@if(session('notification'))
+    <div style="
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        font-weight: bold;
+        color: {{ session('notification')['type'] === 'success' ? '#155724' : '#721c24' }};
+        background-color: {{ session('notification')['type'] === 'success' ? '#d4edda' : '#f8d7da' }};
+        border: 1px solid {{ session('notification')['type'] === 'success' ? '#c3e6cb' : '#f5c6cb' }};
+    ">
+        {{ session('notification')['text'] }}
+    </div>
+@endif
+
+
 <form action="{{ route('absence.store') }}" method="post" class="max-w-lg mx-auto p-6 mt-20 bg-white rounded-lg shadow-md">
     @csrf
 
