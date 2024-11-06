@@ -24,7 +24,7 @@ class AbsenceRequest extends FormRequest
         $rules['user'] = 'required|exists:users,id';
         $rules['motif'] = 'required|exists:motifs,id';
         $rules['debut'] = 'required|date';
-        $rules['fin'] = 'required|date|after:date_debut';
+        $rules['fin'] = 'required|date|after:debut';
 
         return $rules;
     }

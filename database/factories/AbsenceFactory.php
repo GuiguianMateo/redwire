@@ -21,8 +21,8 @@ class AbsenceFactory extends Factory
         return [
             'user_id' => User::factory()->create()->id,
             'motif_id' => Motif::factory()->create()->id,
-            'date_debut' => $this->faker->date(),
-            'date_fin' => $this->faker->date(),
+            'date_debut' => $dateDebut = $this->faker->date(),
+            'date_fin' => $this->faker->dateTimeBetween($dateDebut, '+1 year'),
         ];
     }
 }

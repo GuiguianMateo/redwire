@@ -59,6 +59,12 @@ class AbsenceController extends Controller
         $data = $request->all();
         $absence = new Absence();
 
+        if ($data['fin'] < $data['debut']) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['date_fin' => __('La date de fin ne peut pas être antérieure à la date de début.')]);
+        }
+
         $absence->user_id = $data['user'];
         $absence->motif_id = $data['motif'];
         $absence->date_debut = $data['debut'];
@@ -117,6 +123,7 @@ class AbsenceController extends Controller
     public function update(AbsenceRequest $request, Absence $absence): RedirectResponse
     {
         if (Auth::user() && Auth::user()->can('absence-edit')) {
+
             $oldname = $absence->user->name;
             $oldtitre = $absence->motif->titre;
             $olddebut = $absence->date_debut;
@@ -127,6 +134,12 @@ class AbsenceController extends Controller
             $absence->motif_id = $data['motif'];
             $absence->date_debut = $data['debut'];
             $absence->date_fin = $data['fin'];
+
+            if ($data['fin'] < $data['debut']) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['date_fin' => __('La date de fin ne peut pas être antérieure à la date de début.')]);
+            }
 
             $absence->save();
 
