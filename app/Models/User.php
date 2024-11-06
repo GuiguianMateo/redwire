@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany; // Ajoutez cette ligne
  * @property int $id
  * @property string $name
  * @property string $email
+ * @property int $jour_conge
  * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property mixed $password
  * @property string|null $remember_token

@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Carbon\Carbon;
 
 class UserController extends Controller
 {
@@ -23,6 +24,8 @@ class UserController extends Controller
         $users = Cache::remember('users_with_trashed', 60 * 60 * 24, function () {
             return User::withTrashed()->get();
         });
+
+        $this->compteurConge();
 
         return view('user.index', compact('users'));
     }
@@ -139,5 +142,16 @@ class UserController extends Controller
             return redirect()->route('user.index');
         }
         abort(403);
+    }
+
+    private function compteurConge(){
+        $date = Carbon::now();
+        if ($date->isStartOfMonth()){
+            $users = User::all();
+            foreach ($users as $user){
+                $user->jour_conge+=2.5;
+                $user->save();
+            }
+        }
     }
 }
