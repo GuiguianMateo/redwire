@@ -65,7 +65,7 @@ class Absence extends Model
         return $this->belongsTo(Motif::class);
     }
 
-    protected static function booted()
+    /*protected static function booted()
     {
         static::created(function ($absence) {
             $absence->updateUserConge();
@@ -74,9 +74,9 @@ class Absence extends Model
         static::updated(function ($absence) {
             $absence->updateUserConge();
         });
-    }
+    }*/
 
-    public function updateUserConge()
+    /*public function updateUserConge()
     {
         $user = $this->user;
 
@@ -93,5 +93,5 @@ class Absence extends Model
 
         // Sauvegarder l'utilisateur avec les jours restants
         $user->save();
-    }
+    }*/
 }
