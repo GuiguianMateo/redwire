@@ -83,6 +83,27 @@ class AbsenceController extends Controller
             Mail::to(Auth::user()->email)->send(new CreateAbsence($absence));
         }
 
+
+        // Récupérer l'utilisateur lié à l'absence
+        $user = User::find($data['user']);
+        if (!$user) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['user' => __('Utilisateur introuvable.')]);
+        }
+
+        // Calculer le nombre de jours d'absence demandés
+        $dateDebut = Carbon::parse($data['debut']);
+        $dateFin = Carbon::parse($data['fin']);
+        $joursAbsence = $dateDebut->diffInDays($dateFin) + 1;
+
+        // Vérifier si l'utilisateur a suffisamment de jours de congé
+        if ($user->jour_conge < $joursAbsence) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['jours_conge' => __('Vous n\'avez pas suffisamment de jours de congé pour cette absence.')]);
+        }
+
         return redirect()->route('absence.index');
     }
 
