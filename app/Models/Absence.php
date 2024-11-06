@@ -65,6 +65,7 @@ class Absence extends Model
         return $this->belongsTo(Motif::class);
     }
 
+
     protected static function booted()
     {
         static::created(function ($absence) {
@@ -80,17 +81,21 @@ class Absence extends Model
     {
         $user = $this->user;
 
-        // Calcul de la différence en jours entre `date_debut` et `date_fin` pour cette absence
-        $joursPris = Carbon::parse($this->date_debut)->diffInDays(Carbon::parse($this->date_fin)) + 1;
-
-        // Total des jours d'absence pour cet utilisateur
-        $joursTotalPris = $user->absence->sum(function ($absence) {
+        // Calcul de la différence en jours entre `date_debut` et `date_fin` pour chaque absence
+        $joursPris = $user->absence->sum(function ($absence) {
             return Carbon::parse($absence->date_debut)->diffInDays(Carbon::parse($absence->date_fin)) + 1;
         });
 
-        // Met à jour le nombre de jours de congé restants
-        $user->jour_conge = max(0, 50 - $joursTotalPris); // Remplacez 50 par une variable si le total est dynamique
+        // Récupération du quota initial de congés, par exemple depuis `jours_conge_initial`
+        $quotaConges = $user->jours_conge_initial ?? 50; // Valeur par défaut si non défini
+
+        // Calcul des jours de congé restants
+        $joursRestants = max(0, $quotaConges - $joursPris);
+
+        // Mise à jour du champ `jour_conge` de l'utilisateur
+        $user->jour_conge = $joursRestants;
         $user->save();
     }
 
 }
+
