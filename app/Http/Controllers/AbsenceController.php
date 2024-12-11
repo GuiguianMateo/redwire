@@ -11,6 +11,7 @@ use App\Mail\RestoreAbsence;
 use App\Models\Absence;
 use App\Models\Motif;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
