@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AbsenceController;
+use App\Http\Controllers\CalendrierController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MotifController;
 use App\Http\Controllers\ProfileController;
@@ -42,5 +43,6 @@ Route::middleware('auth')->group(function () {
 
     Route::get('language/{code_iso}', [LanguageController::class, 'change'])->name('language.change');
 });
-
 require __DIR__.'/auth.php';
+Route::get('/calendrier', [CalendrierController::class, 'index'])
+    ->name('calendrier.index');
