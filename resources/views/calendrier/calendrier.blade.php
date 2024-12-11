@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="container mx-auto p-4">
+
+<div id="calendar"></div>
+{{-- <div class="container mx-auto p-4">
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <div class="flex justify-between items-center p-4 bg-gray-100">
             <div class="flex items-center space-x-2">
@@ -70,5 +72,5 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}
 @endsection
