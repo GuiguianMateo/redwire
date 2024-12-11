@@ -146,7 +146,7 @@ class UserController extends Controller
 
     private function compteurConge(){
         $date = Carbon::now();
-        if ($date->isStartOfMonth()){
+        if ($date->startOfMonth()->startOfDay()){
             $users = User::all();
             foreach ($users as $user){
                 $user->jour_conge+=2.5;
