@@ -11,6 +11,7 @@ use App\Mail\RestoreAbsence;
 use App\Models\Absence;
 use App\Models\Motif;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Auth;
@@ -57,29 +58,77 @@ class AbsenceController extends Controller
     public function store(AbsenceRequest $request): RedirectResponse
     {
         $data = $request->all();
-        $absence = new Absence();
 
+        // Récupérer l'utilisateur
+        $user = User::find($data['user']);
+
+        // Calculer les jours demandés
+        $joursDemandes = $this->calculerJoursDemandes($data['debut'], $data['fin']);
+
+        // Vérifier le solde de jours de congé
+        if ($user->jour_conge < $joursDemandes) {
+            // Notification d'erreur
+            session()->flash('notification', [
+                'type' => 'error',
+                'text' => __("Vous n'avez pas assez de jours de congé disponibles pour cette demande.")
+            ]);
+
+            return redirect()->back()->withInput()
+                ->withErrors(['jour_conge' => __("Vous n'avez pas assez de jours de congé disponibles.")]);
+        }
+
+        // Création de l'absence
+        $absence = new Absence();
         $absence->user_id = $data['user'];
         $absence->motif_id = $data['motif'];
         $absence->date_debut = $data['debut'];
         $absence->date_fin = $data['fin'];
         $absence->status = $data['status'];
-
         $absence->save();
 
+        // Mise à jour du solde de jours de congé
+        $user->jour_conge -= $joursDemandes;
+        $user->save();
+
+        // Vider le cache
         Cache::forget('absences_with_trashed');
         Cache::forget('users_with_trashed');
         Cache::forget('motifs_with_trashed');
 
-        session()->flash('message', ['type' => 'success', 'text' => __('Absence created successfully.')]);
+        // Notification de succès
+        session()->flash('notification', [
+            'type' => 'success',
+            'text' => __('Absence created successfully.')
+        ]);
 
-        if (Auth::check() && Auth::user() !== null && Auth::user()->email !== null) {
+        // Envoi de l'email de confirmation
+        if (Auth::check() && Auth::user()->email !== null) {
             Mail::to(Auth::user()->email)->send(new CreateAbsence($absence));
+        }
+
+
+        // Récupérer l'utilisateur lié à l'absence
+        $user = User::find($data['user']);
+        if (!$user) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['user' => __('Utilisateur introuvable.')]);
+        }
+
+        // Calculer le nombre de jours d'absence demandés
+        $dateDebut = Carbon::parse($data['debut']);
+        $dateFin = Carbon::parse($data['fin']);
+        $joursAbsence = $dateDebut->diffInDays($dateFin) + 1;
+
+        // Vérifier si l'utilisateur a suffisamment de jours de congé
+        if ($user->jour_conge < $joursAbsence) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['jours_conge' => __('Vous n\'avez pas suffisamment de jours de congé pour cette absence.')]);
         }
 
         return redirect()->route('absence.index');
     }
-
 
 
     /**
@@ -128,13 +177,19 @@ class AbsenceController extends Controller
             $absence->date_debut = $data['debut'];
             $absence->date_fin = $data['fin'];
 
+            if ($data['fin'] < $data['debut']) {
+                return redirect()->back()
+                    ->withInput()
+                    ->withErrors(['date_fin' => __('La date de fin ne peut pas être antérieure à la date de début.')]);
+            }
+
             $absence->save();
 
             Cache::forget('absences_with_trashed');
             Cache::forget('users_with_trashed');
             Cache::forget('motifs_with_trashed');
 
-            session()->flash('message', ['type' => 'success', 'text' => __('Absence edited successfully.')]);
+            session()->flash('message', ['type' => 'success', 'text' => __('Absence modifier avec succès.')]);
 
             if (Auth::check()) {
                 Mail::to(Auth::user()->email)->send(new EditAbsence($absence, $oldname, $oldtitre, $olddebut, $oldfin));
@@ -230,5 +285,21 @@ class AbsenceController extends Controller
             return redirect()->route('absence.demande');
         }
         abort(403);
+    }
+
+    /**
+     * @param string $debutStr
+     * @param string $finStr
+     * @return int
+     */
+    private function calculerJoursDemandes(string $debutStr, string $finStr): int
+    {
+        $debut = new \DateTime($debutStr);
+        $fin = new \DateTime($finStr);
+
+        $interval = $debut->diff($fin);
+        $joursDemandes = $interval->days + 1;
+
+        return $joursDemandes;
     }
 }

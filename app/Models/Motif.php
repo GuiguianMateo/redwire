@@ -6,18 +6,19 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
 /**
+ * 
+ *
  * @property int $id
  * @property string $titre
  * @property int $is_accessible_salarie
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property \Illuminate\Support\Carbon|null $deleted_at
- *
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property Carbon|null $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Absence> $absence
  * @property-read int|null $absence_count
- *
  * @method static \Database\Factories\MotifFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Motif newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Motif newQuery()
@@ -31,7 +32,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @method static \Illuminate\Database\Eloquent\Builder|Motif whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Motif withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Motif withoutTrashed()
- *
  * @mixin \Eloquent
  */
 class Motif extends Model
@@ -46,5 +46,15 @@ class Motif extends Model
     public function absence(): HasMany
     {
         return $this->hasMany(Absence::class);
+    }
+    private function compteurConge(){
+        $date = Carbon::now();
+        if ($date->startOfMonth()->startOfDay()){
+            $users = User::all();
+            foreach ($users as $user){
+                $user->jour_conge+=2.5;
+                $user->save();
+            }
+        }
     }
 }

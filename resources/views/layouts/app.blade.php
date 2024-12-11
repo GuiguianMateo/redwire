@@ -30,6 +30,12 @@
             <!-- Page Content -->
             <main>
                 @yield('content')
+
+                @if(Route::currentRouteName() === 'dashboard')
+                    {{ $slot }}
+                @endif
+
+
             </main>
         </div>
     </body>

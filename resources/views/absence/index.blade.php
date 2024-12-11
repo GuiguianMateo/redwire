@@ -22,8 +22,7 @@
             </div>
             <ul class="list-group">
             @php
-                $absencesNotPending = $absences->where('status', '!=', 'pending');
-                $userAdmin = Auth::user()->isA('admin') ? $absencesNotPending : $absencesNotPending->where('user_id', Auth::user()->id);
+                $userAdmin = Auth::user()->isA('admin') ? $absences : $absences->where('user_id', Auth::user()->id);
             @endphp
 
             @forelse ($userAdmin as $absence)
