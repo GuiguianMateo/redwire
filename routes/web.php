@@ -3,6 +3,8 @@
 use App\Http\Controllers\AbsenceController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MotifController;
+
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
@@ -41,6 +43,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/status/{absence}/status', [AbsenceController::class, 'status'])->name('absence.status');
 
     Route::get('language/{code_iso}', [LanguageController::class, 'change'])->name('language.change');
+
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
 
 });
 require __DIR__.'/auth.php';

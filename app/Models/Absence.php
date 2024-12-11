@@ -65,6 +65,46 @@ class Absence extends Model
         return $this->belongsTo(Motif::class);
     }
 
+    protected static function booted()
+    {
+        static::created(function ($absence) {
+            $absence->updateUserConge();
+        });
+
+        static::updated(function ($absence) {
+            $absence->updateUserConge();
+        });
+
+
+    }
+    public function updateUserConge()
+{
+    $user = $this->user; // Assurez-vous que cette relation fonctionne
+
+    // Calcul des jours pris
+    $joursPris = $user->absence->sum(function ($absence) {
+        return Carbon::parse($absence->date_debut)->diffInDays(Carbon::parse($absence->date_fin)) + 1;
+    });
+
+    $quotaConges = $user->jours_conge_initial ?? 50; // Quota initial
+    $joursRestants = max(0, $quotaConges - $joursPris);
+
+    // Mise à jour des jours restants
+    $user->jour_conge = $joursRestants;
+    $user->save();
+
+    // Création de la notification
+    $message = "Votre solde de congés a été mis à jour : {$joursRestants} jours restants. Raison : " .
+               ($this->wasRecentlyCreated ? "Nouvelle absence ajoutée" : "Absence modifiée");
+
+    \App\Models\Notification::create([
+        'user_id' => $user->id,
+        'message' => $message,
+    ]);
+}
+
+
+
 
 
 }

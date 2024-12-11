@@ -302,4 +302,5 @@ class AbsenceController extends Controller
 
         return $joursDemandes;
     }
+
 }
