@@ -11,6 +11,8 @@ use Silber\Bouncer\Database\HasRolesAndAbilities;
 use Illuminate\Database\Eloquent\Relations\HasMany; // Ajoutez cette ligne
 
 /**
+ * 
+ *
  * @property int $id
  * @property string $name
  * @property string $email
@@ -20,7 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany; // Ajoutez cette ligne
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- *
+ * @property float $jour_conge
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Silber\Bouncer\Database\Ability> $abilities
  * @property-read int|null $abilities_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Absence> $absence
@@ -31,7 +33,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany; // Ajoutez cette ligne
  * @property-read int|null $roles_count
  * @property-read \Illuminate\Database\Eloquent\Collection<int, \Laravel\Sanctum\PersonalAccessToken> $tokens
  * @property-read int|null $tokens_count
- *
  * @method static \Database\Factories\UserFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|User newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|User newQuery()
@@ -45,13 +46,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany; // Ajoutez cette ligne
  * @method static \Illuminate\Database\Eloquent\Builder|User whereIs($role)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereIsAll($role)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereIsNot($role)
+ * @method static \Illuminate\Database\Eloquent\Builder|User whereJourConge($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereName($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User wherePassword($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereRememberToken($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Eloquent\Builder|User withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|User withoutTrashed()
- *
  * @mixin \Eloquent
  */
 class User extends Authenticatable

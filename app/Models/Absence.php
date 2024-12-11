@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Carbon\Carbon;
 
 /**
+ * 
+ *
  * @property int $id
  * @property int $user_id
  * @property int $motif_id
@@ -18,10 +20,8 @@ use Carbon\Carbon;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
- *
  * @property-read \App\Models\Motif $motif
  * @property-read \App\Models\User $user
- *
  * @method static \Database\Factories\AbsenceFactory factory($count = null, $state = [])
  * @method static \Illuminate\Database\Eloquent\Builder|Absence newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|Absence newQuery()
@@ -38,7 +38,6 @@ use Carbon\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder|Absence whereUserId($value)
  * @method static \Illuminate\Database\Eloquent\Builder|Absence withTrashed()
  * @method static \Illuminate\Database\Eloquent\Builder|Absence withoutTrashed()
- *
  * @mixin \Eloquent
  */
 class Absence extends Model
