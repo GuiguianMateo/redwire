@@ -5,6 +5,7 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\MotifController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
+use App\Models\User;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,7 +20,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('dashboard');
+    // return 'Test Route Working';
+    $user = Auth::user();
+    $users = User::find($user->id);
+    $congeMonth = $user->jour_conge + 2.5;
+    $congeYear = $user->jour_conge + 30;
+    return view('dashboard', compact('users', 'congeMonth', 'congeYear'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
