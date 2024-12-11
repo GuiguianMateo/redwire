@@ -14,13 +14,16 @@ class DashboardController extends Controller
 {
     public function index(Request $request): View
     {
-        $users = User::all();
+        $user = Auth::user();
+        $users = User::find($user->id);
+        $congeMonth = $user->jour_conge + 2.5;
+        $congeYear = $user->jour_conge + 30;
 
         $selectannee = $request->input('year', date('Y'));
         $nb_annee = $selectannee - date('Y');
         $conge_annee = 30 * max($nb_annee, 1);
 
-        return view('Dashboard', compact('users', 'selectannee', 'conge_annee'));
+        return view('Dashboard', compact('users', 'selectannee', 'conge_annee', 'congeMonth', 'congeYear'));
     }
 
 

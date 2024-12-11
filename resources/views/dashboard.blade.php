@@ -12,12 +12,15 @@
                 </div>
             </div>
             <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <x-period-conge :users="$users" :congeMonth="$congeMonth" :congeYear="$congeYear" />
+                <div class="flex justify-center p-6 text-gray-900 dark:text-gray-100 gap-48">
+                    <div>
+                        <x-period-conge :users="$users" :congeMonth="$congeMonth" :congeYear="$congeYear" />
+                    </div>
+                    <div>
+                        <x-year-conge :selectannee="$selectannee" :conge_annee="$conge_annee" :users="$users"/>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
-    <x-year-conge :selectannee="$selectannee" :conge_annee="$conge_annee" :users="$users"/>
-
 </x-app-layout>
