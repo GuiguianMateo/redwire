@@ -14,4 +14,6 @@
             </div>
         </div>
     </div>
+    <x-year-conge :selectannee="$selectannee" :conge_annee="$conge_annee" :users="$users"/>
+
 </x-app-layout>
