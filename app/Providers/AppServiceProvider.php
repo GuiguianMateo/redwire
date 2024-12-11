@@ -2,7 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Absence;
 use Illuminate\Support\ServiceProvider;
+use App\Observers\AbsenceObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,5 +20,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Absence::observe(AbsenceObserver::class);
     }
 }
