@@ -72,6 +72,10 @@
                                 <li class="dropdown-item text-center">
                                     {{ __('No notifications') }}
                                 </li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li class="text-center">
+                                    <a href="{{ route('notifications.index') }}">{{ __('View all notifications') }}</a>
+                                </li>
                             @endif
                         </ul>
                     </li>
