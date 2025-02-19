@@ -11,6 +11,12 @@
 
     @elseif($categorySlug === 'autres-absences')
 
+    @elseif($categorySlug === 'rtt')
+
+    @elseif($categorySlug === 'conges-anticipation')
+
+    @elseif($categorySlug === 't0')
+
     @endif
 
     <!-- Inclusion dynamique de la documentation -->
