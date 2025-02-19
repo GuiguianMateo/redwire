@@ -7,6 +7,7 @@ use App\Http\Controllers\MotifController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EventController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,6 +36,7 @@ Route::middleware('auth')->group(function () {
     Route::resource('/user', UserController::class)->withTrashed();
     Route::resource('/absence', AbsenceController::class)->withTrashed();
     Route::resource('/motif', MotifController::class)->withTrashed();
+    Route::resource('/event', EventController::class)->withTrashed();
 
     Route::get('/motif/{motif}/restore', [MotifController::class, 'restore'])->withTrashed()->name('motif.restore');
     Route::get('/absence/{absence}/restore', [AbsenceController::class, 'restore'])->withTrashed()->name('absence.restore');
@@ -47,5 +49,6 @@ Route::middleware('auth')->group(function () {
 
 });
 require __DIR__.'/auth.php';
-Route::get('/calendrier', [CalendrierController::class, 'index'])
-    ->name('calendrier.index');
+// Routes existantes pour les événements
+Route::get('/full-calender', [EventController::class, 'index']);
+Route::post('/full-calender-ajax', [EventController::class, 'ajax']);

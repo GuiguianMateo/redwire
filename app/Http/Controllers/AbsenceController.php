@@ -302,4 +302,34 @@ class AbsenceController extends Controller
 
         return $joursDemandes;
     }
+
+    public function calendarData(Request $request)
+    {
+        $absences = Absence::with(['user', 'motif'])
+            ->get()
+            ->map(function ($absence) {
+                return [
+                    'id' => $absence->id,
+                    'title' => $absence->user->name . ' - ' . $absence->motif->titre,
+                    'start' => $absence->date_debut,
+                    'end' => $absence->date_fin,
+                    'user_name' => $absence->user->name,
+                    'motif_titre' => $absence->motif->titre,
+                    'status' => $absence->status,
+                    'color' => $this->getStatusColor($absence->status)
+                ];
+            });
+
+        return response()->json($absences);
+    }
+
+    private function getStatusColor($status)
+    {
+        return match ($status) {
+            'En attente' => '#FCD34D',    // Jaune
+            'Validé' => '#34D399',        // Vert
+            'Refusé' => '#F87171',        // Rouge
+            default => '#9CA3AF'          // Gris
+        };
+    }
 }

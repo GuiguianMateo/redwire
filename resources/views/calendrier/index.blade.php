@@ -68,6 +68,9 @@
                     </tbody>
                 </table>
             </div>
+            <div class="p-6 text-white">
+                <a class="p-2 px-5 rounded bg-blue-500" href="{{ route('event.create') }}">{{ __("Event") }}</a>
+            </div>
         </div>
     </div>
 </div>
