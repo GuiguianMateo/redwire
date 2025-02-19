@@ -61,8 +61,12 @@ Route::get('/calendrier', [CalendrierController::class, 'index'])
     Route::get('/documentation', function () {
         $categories = [
             'conges-payes' => ['title' => 'Congés payés'],
+            'conges-anticipation' => ['title' => 'Congés par anticipation'],
+            'rtt' => ['title' => 'RTT'],
+            't0' => ['title' => 'T0'],
             'arrets-maladie' => ['title' => 'Arrêts maladie'],
             'autres-absences' => ['title' => 'Autres absences'],
+
         ];
 
         return view('docs.docs', compact('categories'));
@@ -71,6 +75,9 @@ Route::get('/calendrier', [CalendrierController::class, 'index'])
     Route::get('/documentation/{category}', function ($category) {
         $allCategories = [
             'conges-payes' => ['title' => 'Congés payés'],
+            'conges-anticipation' => ['title' => 'Congés par anticipation'],
+            'rtt' => ['title' => 'Autres absences'],
+            't0' => ['title' => 'T0'],
             'arrets-maladie' => ['title' => 'Arrêts maladie'],
             'autres-absences' => ['title' => 'Autres absences'],
         ];
