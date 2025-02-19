@@ -75,11 +75,7 @@ Ensuite vous allez y modifier :
 ### Terminal
 Dans le même tereminal précédent, lancez ces commandes :
 
-     art migrate
-     
-Si un message vous demande de créé la base de donnée, vous selectionnez "yes"
-
-     art db:seed
+     art migrate db:seed
 
 ## Lancement du projet  
 
