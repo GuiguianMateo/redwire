@@ -45,7 +45,8 @@ Route::middleware('auth')->group(function () {
     Route::get('language/{code_iso}', [LanguageController::class, 'change'])->name('language.change');
 
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
-    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.markAsRead');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+
 
 });
 require __DIR__.'/auth.php';

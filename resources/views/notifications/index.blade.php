@@ -9,7 +9,13 @@
             {{ $notification->message }}
             <small class="text-muted d-block">Reçue le {{ $notification->created_at->format('d/m/Y à H:i') }}</small>
             @if(!$notification->is_read)
-            <a href="{{ route('notifications.markAsRead', $notification) }}" class="btn btn-sm btn-primary mt-2">Marquer comme lue</a>
+            <form action="{{ route('notifications.read', $notification->id) }}" method="post" style="display: inline;">
+                @csrf
+                <button type="submit" class="btn btn-sm btn-link text-primary">
+                    Marquer comme lu
+                </button>
+            </form>
+
             @endif
         </li>
         @endforeach

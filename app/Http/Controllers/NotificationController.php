@@ -11,8 +11,6 @@ class NotificationController extends Controller
     public function index()
     {
         $notifications = Notification::where('user_id',auth()->user()->id)->get();
-        //$notifications = Auth::user()->notifications()->where('is_read', false)->count();
-        //$allNotifications = Auth::user()->notifications;
         return view('notifications.index', compact('notifications'));
     }
 
@@ -50,10 +48,7 @@ class NotificationController extends Controller
     }
 
     public function markAsRead(Notification $notification) {
-        $this->authorize('view', $notification); // Sécurisation
-
         $notification->update(['is_read' => true]);
-
         return redirect()->route('notifications.index');
     }
 }
