@@ -22,6 +22,7 @@
                     @if(Auth::user()->isA('admin'))
                         <a class="inline-flex items-center px-1 pt-1 border-b-2 hover:border-indigo-400 text-xs sm:text-sm font-medium leading-5 text-gray-900 focus:border-indigo-700 transition duration-150 ease-in-out" href="{{ route('absence.demande') }}">{{ __('Requests') }}</a>
                     @endif
+                    <a class="inline-flex items-center px-1 pt-1 border-b-2 hover:border-indigo-400 text-xs sm:text-sm font-medium leading-5 text-gray-900 focus:border-indigo-700 transition duration-150 ease-in-out" href="{{ route('documentation.index') }}">{{ __('Docs') }}</a>
                 </div>
             </div>
 

@@ -49,3 +49,30 @@ Route::middleware('auth')->group(function () {
 require __DIR__.'/auth.php';
 Route::get('/calendrier', [CalendrierController::class, 'index'])
     ->name('calendrier.index');
+
+
+
+    Route::get('/documentation', function () {
+        $categories = [
+            'conges-payes' => ['title' => 'Congés payés'],
+            'arrets-maladie' => ['title' => 'Arrêts maladie'],
+            'autres-absences' => ['title' => 'Autres absences'],
+        ];
+
+        return view('docs.docs', compact('categories'));
+    })->name('documentation.index');
+
+    Route::get('/documentation/{category}', function ($category) {
+        $allCategories = [
+            'conges-payes' => ['title' => 'Congés payés'],
+            'arrets-maladie' => ['title' => 'Arrêts maladie'],
+            'autres-absences' => ['title' => 'Autres absences'],
+        ];
+
+        if (!array_key_exists($category, $allCategories)) {
+            abort(404);
+        }
+
+        return view('docs.category', ['category' => $allCategories[$category], 'categorySlug' => $category]);
+    })->name('documentation.category');
+
