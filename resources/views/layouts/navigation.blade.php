@@ -31,6 +31,15 @@
 
             <!-- Notifications -->
             <div class="flex gap-4">
+                <div class="my-auto">
+                    @if(app()->getLocale() == 'fr')
+                        <a class="flex items-center gap-2" href="{{ route('language.change', 'en') }}">
+                        <img src="{{ asset('images/flags/royaume-uni.png') }}">{{ 'Anglais' }}</a>
+                    @else
+                        <a class="flex items-center gap-2" href="{{ route('language.change', 'fr') }}">
+                        <img src="{{ asset('images/flags/france.png') }}">{{ 'French' }}</a>
+                    @endif
+                </div>
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item dropdown">
                         <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
